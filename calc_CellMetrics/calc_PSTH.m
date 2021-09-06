@@ -25,6 +25,7 @@ addParameter(p,'percentile',99,@isnumeric);     % if events does not have the sa
 addParameter(p,'plots',true,@islogical);        % Show plots?
 addParameter(p,'eventName','',@ischar);         % Title used for plots
 addParameter(p,'maxWindow',10,@isnumeric);      % Maximum window size in seconds
+addParameter(p,'saveFig',true,@islogical);
 
 parse(p,varargin{:})
 
@@ -37,6 +38,7 @@ percentile = p.Results.percentile;
 eventName = p.Results.eventName;
 plots = p.Results.plots;
 maxWindow = p.Results.maxWindow;
+saveFig = p.Results.saveFig;
 
 % If no duration is given, an optimal duration is determined
 if duration == 0
@@ -124,10 +126,18 @@ if plots
     figure, plot(time,PSTH_out), title(eventName), xlabel('Time')
     [~,index2] = sort(modulationIndex,'descend');
     [~,index3] = sort(modulationPeakResponseTime);
+    if saveFig
+        saveas(gcf,'SummaryFigures\Ripples_PSTH.png')
+    end
     
     figure,
     subplot(2,2,1), histogram(modulationIndex,40), title('modulationIndex'), xlabel('Ratio'), ylabel(eventName)
     subplot(2,2,2), histogram(modulationPeakResponseTime,40), title('modulationPeakResponseTime'), xlabel('Time')
     subplot(2,2,3), imagesc(time,[1:size(PSTH_out,2)],zscore(PSTH_out(:,index2))'), title('Sorting: modulationIndex'), xlabel('Time'), ylabel('Units')
     subplot(2,2,4), imagesc(time,[1:size(PSTH_out,2)],zscore(PSTH_out(:,index3))'),  title('Sorting: modulationPeakResponseTime'), xlabel('Time')
+    if saveFig
+        saveas(gcf,'SummaryFigures\Ripples_modulationIndex.png')
+    end
 end
+
+

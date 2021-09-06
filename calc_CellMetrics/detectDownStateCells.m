@@ -8,7 +8,10 @@ function [meanCCG,tR,population_modIndex] = detectDownStateCells(spikes,sr,varar
 
 p = inputParser;
 addParameter(p,'showFigures',true,@islogical);
+addParameter(p,'saveFig',true,@islogical);
 parse(p,varargin{:})
+saveFig = p.Results.saveFig;
+
 
 binSize = 0.01;  % in seconds (default: 0.010 second bin size)
 duration = 0.5; % in seconds (default: +-0.250 second)
@@ -34,13 +37,18 @@ population_modIndex  = mean(meanCCG([21:31],:))./mean(meanCCG([1:5,47:51],:));
 
 disp('Detecting down-state cells')
 if p.Results.showFigures
-if isfield(spikes,'sessionName') 
-    figure('name',spikes.sessionName)
-else
-    figure
+    if isfield(spikes,'sessionName') 
+        figure('name',spikes.sessionName)
+    else
+        figure
+    end
+    subplot(1,2,1)
+    plot(tR,meanCCG./mean(meanCCG)), title('Average CCG'),xlabel('Time (seconds)'), axis tight
+    subplot(1,2,2)
+    histogram(population_modIndex), title('Population modulation index'), xlabel('Modulation strength')
+    if saveFig
+        saveas(gcf,'SummaryFigures\Population Modulation Index.png')
+    end
 end
-subplot(1,2,1)
-plot(tR,meanCCG./mean(meanCCG)), title('Average CCG'),xlabel('Time (seconds)'), axis tight
-subplot(1,2,2)
-histogram(population_modIndex), title('Population modulation index'), xlabel('Modulation strength')
+
 end

@@ -13,8 +13,9 @@ function waveform_metrics = calc_waveform_metrics(waveforms,sr_in,varargin)
 % petersen.peter@gmail.com
 p = inputParser;
 addParameter(p,'showFigures',true,@islogical);
+addParameter(p,'saveFig',true,@islogical);
 parse(p,varargin{:})
-
+saveFig = p.Results.saveFig;
 
 filtWaveform = waveforms.filtWaveform;
 timeWaveform = waveforms.timeWaveform{1};
@@ -120,37 +121,41 @@ waveform_metrics.ab_ratio = (peakB-peakA)./(peakA+peakB);
 waveform_metrics.trough = trough;
 
 if p.Results.showFigures
-axis tight
-subplot(6,2,2)
-hist(waveform_metrics.peaktoTrough,0:0.0250:0.90);
-h = findobj(gca, 'Type','patch');
-set(h(1), 'FaceColor','r')
-title('Peak-to-Trough'), axis tight
+    axis tight
+    subplot(6,2,2)
+    hist(waveform_metrics.peaktoTrough,0:0.0250:0.90);
+    h = findobj(gca, 'Type','patch');
+    set(h(1), 'FaceColor','r')
+    title('Peak-to-Trough'), axis tight
 
-subplot(6,2,4)
-hist(waveform_metrics.troughtoPeak,0:0.0250:1);
-h = findobj(gca, 'Type','patch');
-set(h(1), 'FaceColor','g')
-title('Trough-to-Peak'), axis tight
+    subplot(6,2,4)
+    hist(waveform_metrics.troughtoPeak,0:0.0250:1);
+    h = findobj(gca, 'Type','patch');
+    set(h(1), 'FaceColor','g')
+    title('Trough-to-Peak'), axis tight
 
-subplot(6,2,6)
-hist((t_before+t_after)/sr*1000,0:0.0250:1.25);
-h = findobj(gca, 'Type','patch');
-set(h(1), 'FaceColor','y')
-title('Peak-to-Peak (red + green)'), axis tight
+    subplot(6,2,6)
+    hist((t_before+t_after)/sr*1000,0:0.0250:1.25);
+    h = findobj(gca, 'Type','patch');
+    set(h(1), 'FaceColor','y')
+    title('Peak-to-Peak (red + green)'), axis tight
 
-subplot(6,2,8)
-hist(waveform_metrics.derivative_TroughtoPeak,0:0.0250:0.8);
-h = findobj(gca, 'Type','patch');
-set(h(1), 'FaceColor','m')
-title('Trough-to-Peak (1st derivative)'), axis tight
+    subplot(6,2,8)
+    hist(waveform_metrics.derivative_TroughtoPeak,0:0.0250:0.8);
+    h = findobj(gca, 'Type','patch');
+    set(h(1), 'FaceColor','m')
+    title('Trough-to-Peak (1st derivative)'), axis tight
 
-subplot(6,2,10)
-hist(abs(peakA./trough),[0:0.04:2]);
-title('peak/trough (markers: red/blue))'), axis tight
+    subplot(6,2,10)
+    hist(abs(peakA./trough),[0:0.04:2]);
+    title('peak/trough (markers: red/blue))'), axis tight
 
-subplot(6,2,12)
-hist(waveform_metrics.ab_ratio,30);
-title('AB ratio (markers: red/green))'), axis tight
+    subplot(6,2,12)
+    hist(waveform_metrics.ab_ratio,30);
+    title('AB ratio (markers: red/green))'), axis tight
 end
+if saveFig
+    saveas(gcf,'SummaryFigures\waveform_metrics.png');
+end
+
 end

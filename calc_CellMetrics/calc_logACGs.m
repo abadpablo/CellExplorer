@@ -6,7 +6,10 @@ function acg = calc_logACGs(spikes_times,varargin)
 % Last edited: 24-06-2021
 p = inputParser;
 addParameter(p,'showFigures',true,@islogical);
+addParameter(p,'saveFig',true,@islogical);
+
 parse(p,varargin{:})
+saveFig = p.Results.saveFig;
 
 gcp;
 intervals = -3:0.04:1;
@@ -30,9 +33,14 @@ parfor j = 1:size(spikes_times,2)
 end
 acg.log10 =  acg_log10';
 if p.Results.showFigures
-fig = figure; hold on, set(gca,'xscale','log');
-ax1 = gca;
-xlabel(ax1,'Time (s)'), ylabel(ax1,'Rate (Hz)'), title(ax1,'log ACG distribution')
-plot(ax1,acg.log10_bins,acg.log10)
-title(ax1,'log ACG distribution')
+    fig = figure; hold on, set(gca,'xscale','log');
+    ax1 = gca;
+    xlabel(ax1,'Time (s)'), ylabel(ax1,'Rate (Hz)'), title(ax1,'log ACG distribution')
+    plot(ax1,acg.log10_bins,acg.log10)
+    title(ax1,'log ACG distribution')
+    if saveFig
+        saveas(gcf,'SummaryFigures\log10 ACGs.png')
+    end
+end
+
 end

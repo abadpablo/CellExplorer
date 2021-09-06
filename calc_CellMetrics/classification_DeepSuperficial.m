@@ -301,6 +301,7 @@ end
 
 % Plotting the average ripple with sharp wave across all electrode groups
 figure
+set(gcf,'Position',[100 -100 2500 1200])
 for jj = 1:session.extracellular.nElectrodeGroups
     subplot(2,ceil(session.extracellular.nElectrodeGroups/2),jj)
     plot((SWR_diff{jj}*50)+ripple_time_axis(1)-50,-[0:size(SWR_diff{jj},2)-1]*0.04,'-k','linewidth',2), hold on, grid on

@@ -858,14 +858,18 @@ end
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 
 if any(contains(parameters.metrics,{'theta_metrics','all'})) && ~any(contains(parameters.excludeMetrics,{'theta_metrics'})) && exist(fullfile(basepath,[basename,'.animal.behavior.mat']),'file') && isfield(session.channelTags,'Theta') %&& (~isfield(cell_metrics,'thetaEntrainment') || parameters.forceReload == true)
+% Modified by Abad
+% if any(contains(parameters.metrics,{'theta_metrics','all'})) && ~any(contains(parameters.excludeMetrics,{'theta_metrics'})) && exist(fullfile(basepath,[basename,'.Behavior.mat']),'file') && isfield(session.channelTags,'ThetaChan') %&& (~isfield(cell_metrics,'thetaEntrainment') || parameters.forceReload == true)
+    
     spkExclu = setSpkExclu('theta_metrics',parameters);
     dispLog('Theta metrics',basename);
     InstantaneousTheta = calcInstantaneousTheta2(session);
     load(fullfile(basepath,[basename,'.animal.behavior.mat']),'animal');
+%     load(fullfile(basepath,[basename,'.Behavior.mat'])); % Abad
     theta_bins = preferences.theta.bins;
     cell_metrics.thetaPhasePeak = nan(1,cell_metrics.general.cellCount);
     cell_metrics.thetaPhaseTrough = nan(1,cell_metrics.general.cellCount);
-    % cell_metrics.responseCurves.thetaPhase = nan(length(theta_bins)-1,cell_metrics.general.cellCount);
+    cell_metrics.responseCurves.thetaPhase = nan(length(theta_bins)-1,cell_metrics.general.cellCount);
     cell_metrics.thetaEntrainment = nan(1,cell_metrics.general.cellCount);
     spikes2 = spikes{spkExclu};
 
@@ -876,11 +880,13 @@ if any(contains(parameters.metrics,{'theta_metrics','all'})) && ~any(contains(pa
 
     for j = 1:size(spikes{spkExclu}.times,2)
         Theta_channel = session.channelTags.Theta.channels(1);
+%         Theta_channel = session.channelTags.ThetaChan.channels(1); % Abad
         spikes2.ts{j} = spikes2.ts{j}(spikes{spkExclu}.times{j} < length(InstantaneousTheta.signal_phase{Theta_channel})/session.extracellular.srLfp);
         spikes2.times{j} = spikes2.times{j}(spikes{spkExclu}.times{j} < length(InstantaneousTheta.signal_phase{Theta_channel})/session.extracellular.srLfp);
         spikes2.ts_lfp{j} = ceil(spikes2.ts{j}/downsampling_ratio);
         spikes2.theta_phase{j} = InstantaneousTheta.signal_phase{Theta_channel}(spikes2.ts_lfp{j});
         spikes2.speed{j} = interp1(animal.time,animal.speed,spikes2.times{j});
+%         spikes2.speed{j} = interp1(behavior.timestamps,tracking.speed.v,spikes2.times{j});
         if sum(spikes2.speed{j} > 10)> preferences.theta.min_spikes % only calculated if the unit has above min_spikes (default: 500)
             
             [counts,centers] = histcounts(spikes2.theta_phase{j}(spikes2.speed{j} > preferences.theta.speed_threshold),theta_bins, 'Normalization', 'probability');
@@ -1606,7 +1612,7 @@ if parameters.summaryFigures
 end
 
 dispLog(['Cell metrics calculations complete. Elapsed time is ', num2str(toc(timerCalcMetrics),5),' seconds.'],basename)
-trackGoogleAnalytics('ProcessCellMetrics',2.1); % Anonymous tracking of usage
+% trackGoogleAnalytics('ProcessCellMetrics',2.1); % Anonymous tracking of usage
 
 end
 

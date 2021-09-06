@@ -1,9 +1,13 @@
-function fit_params_out = fit_ACG(acg_narrow,plots)
+function fit_params_out = fit_ACG(acg_narrow,plots,varargin)
 % This function is part of CellExplorer
 % Fits a tripple exponential to the autocorrelogram with 0.5ms bins from -50ms -> 50ms 
 
 % By Peter Petersen
 % Last edited: 24-08-22020;
+p = inputParser;
+addParameter(p,'saveFig',true,@islogical);
+parse(p,varargin{:})
+saveFig = p.Results.saveFig;
 
 if ~exist('plots','var')
     plots = true;
@@ -97,5 +101,9 @@ if plots
     subplot(3,3,9), x1 = rsquare;
     histogram(x1,40), xlabel('r^2'), axis tight, ylabel('r^2')
     drawnow
+end
+
+if saveFig
+    saveas(gcf,'SummaryFigures\fit_ACG.png')
 end
 end

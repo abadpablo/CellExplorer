@@ -21,7 +21,9 @@ function acg_metrics = calc_ACG_metrics(spikes,sr,varargin)%(clustering_path,sr,
 % Last edited: 06-10-2020
 p = inputParser;
 addParameter(p,'showFigures',true,@islogical);
+addParameter(p,'saveFig',true,@islogical);
 parse(p,varargin{:})
+saveFig = p.Results.saveFig;
 
 ThetaModulationIndex = nan(1,spikes.numcells);
 BurstIndex_Royer2012 = nan(1,spikes.numcells);
@@ -51,15 +53,21 @@ end
 toc
 
 if p.Results.showFigures
-figure, subplot(3,1,1)
-histogram(ThetaModulationIndex,40),xlabel('Theta modulation index'), ylabel('Count')
-subplot(3,1,2)
-histogram(BurstIndex_Royer2012,40),xlabel('BurstIndex Royer2012'), ylabel('Count')
-subplot(3,1,3)
-histogram(BurstIndex_Doublets,40),xlabel('BurstIndex Doublets'), ylabel('Count')
+    figure, subplot(3,1,1)
+    histogram(ThetaModulationIndex,40),xlabel('Theta modulation index'), ylabel('Count')
+    subplot(3,1,2)
+    histogram(BurstIndex_Royer2012,40),xlabel('BurstIndex Royer2012'), ylabel('Count')
+    subplot(3,1,3)
+    histogram(BurstIndex_Doublets,40),xlabel('BurstIndex Doublets'), ylabel('Count')
 end
-acg_metrics.acg_wide = acg_wide;
-acg_metrics.acg_narrow = acg_narrow;
-acg_metrics.thetaModulationIndex = ThetaModulationIndex;
-acg_metrics.burstIndex_Royer2012 = BurstIndex_Royer2012;
-acg_metrics.burstIndex_Doublets = BurstIndex_Doublets;
+    acg_metrics.acg_wide = acg_wide;
+    acg_metrics.acg_narrow = acg_narrow;
+    acg_metrics.thetaModulationIndex = ThetaModulationIndex;
+    acg_metrics.burstIndex_Royer2012 = BurstIndex_Royer2012;
+    acg_metrics.burstIndex_Doublets = BurstIndex_Doublets;
+    
+    if saveFig
+        saveas(gcf,'SummaryFigures\ACG_metrics.png')
+    end
+    
+end
