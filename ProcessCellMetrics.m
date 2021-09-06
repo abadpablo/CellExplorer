@@ -108,6 +108,7 @@ addParameter(p,'debugMode',false,@islogical);
 addParameter(p,'transferFilesFromClusterpath',true,@islogical);
 addParameter(p,'showFigures',true,@islogical);
 addParameter(p,'showWaveforms',true,@islogical);
+addParameter(p,'saveFig',true,@islogical);
 
  
 parse(p,varargin{:})
@@ -118,6 +119,7 @@ sessionStruct = p.Results.session;
 basepath = p.Results.basepath;
 parameters = p.Results;
 timerCalcMetrics = tic;
+saveFig = p.Results.saveFig;
 
 % Verifying required toolboxes are installed
 installedToolboxes = ver;
@@ -559,20 +561,24 @@ if any(contains(parameters.metrics,{'waveform_metrics','all'})) && ~any(contains
             end
         end
         if parameters.showFigures
-        fig1 = figure('Name', 'Length constant and Trilateration','NumberTitle', 'off','position',[100,100,1000,800]);
-        subplot(2,2,1), hold on
-        for j = 1:cell_metrics.general.cellCount
-            plot(expential_x{j},expential_y{j})
+            fig1 = figure('Name', 'Length constant and Trilateration','NumberTitle', 'off','position',[100,100,1000,800]);
+            subplot(2,2,1), hold on
+            for j = 1:cell_metrics.general.cellCount
+                plot(expential_x{j},expential_y{j})
+            end
+            title('Spike amplitude (all)'), xlabel('Distance (µm)'), ylabel('µV')
+            subplot(2,2,2), hold off,
+            histogram(cell_metrics.peakVoltage_expFit,20), xlabel('Length constant (µm)')
+            subplot(2,2,3), hold on
+            plot(cell_metrics.peakVoltage,cell_metrics.peakVoltage_expFit,'ok')
+            ylabel('Length constant (µm)'), xlabel('Peak voltage (µV)')
+            subplot(2,2,4), hold on
+            plot(cell_metrics.general.chanCoords.x,cell_metrics.general.chanCoords.y,'.k'), hold on
+            plot(cell_metrics.trilat_x,cell_metrics.trilat_y,'ob'), xlabel('x position (µm)'), ylabel('y position (µm)')
         end
-        title('Spike amplitude (all)'), xlabel('Distance (µm)'), ylabel('µV')
-        subplot(2,2,2), hold off,
-        histogram(cell_metrics.peakVoltage_expFit,20), xlabel('Length constant (µm)')
-        subplot(2,2,3), hold on
-        plot(cell_metrics.peakVoltage,cell_metrics.peakVoltage_expFit,'ok')
-        ylabel('Length constant (µm)'), xlabel('Peak voltage (µV)')
-        subplot(2,2,4), hold on
-        plot(cell_metrics.general.chanCoords.x,cell_metrics.general.chanCoords.y,'.k'), hold on
-        plot(cell_metrics.trilat_x,cell_metrics.trilat_y,'ob'), xlabel('x position (µm)'), ylabel('y position (µm)')
+        
+        if saveFig
+            saveas(gcf,'SummaryFigures\lengthConstant_Trilateration.png')
         end
     end
     
